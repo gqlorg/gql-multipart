@@ -23,18 +23,17 @@ $ npm install gql-multipart
 
 This method creates middleware for [Express](https://github.com/expressjs/expressjs.com) library
 
-````javascript
+```javascript
 gqlMultipartExpress([options: GQLMultipartOptions])
-````
+```
 
 #### gqlMultipartKoa()
 
 This method creates middleware for [Koa](https://github.com/koajs/koa) library
 
-````javascript
+```javascript
 gqlMultipartKoa([options: GQLMultipartOptions])
-````
-
+```
 
 #### GQLMultipartOptions
   
