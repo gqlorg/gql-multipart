@@ -1,4 +1,4 @@
-import Koa from "Koa";
+import Koa from "koa";
 import mount from "koa-mount";
 import {schema, resolvers} from "./schema";
 import {gqlMultipartKoa} from "../../src";
