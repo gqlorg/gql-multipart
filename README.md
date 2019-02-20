@@ -35,18 +35,21 @@ This method creates middleware for [Koa](https://github.com/koajs/koa) library
 gqlMultipartKoa([options: GQLMultipartOptions])
 ```
 
-#### GQLMultipartOptions
+
+#### GQLMultipartOptions
+
   
-  * **highWaterMark** - integer: highWaterMark to use for multipart parser instance (Default: WritableStream default).
-  * **fileHwm** - integer: highWaterMark to use for temp file streams (Default: ReadableStream default).                     
-  * **defCharset** - string: Default character set to use when one isn't defined (Default: 'utf8').
-  * **tempDir** - string: Determines temp directory. Default OS temp directory.
-  * **maxFieldNameSize** - integer:  Max field name size (in bytes) (Default: 100 bytes).
-  * **maxFieldSize** - integer: Max field value size (in bytes) (Default: 1MB).
-  * **maxFields** - integer: Max number of non-file fields (Default: Infinity). 
-  * **maxFileSize** - integer: The max file size (in bytes) (Default: Infinity).                          
-  * **maxFiles** - integer: The max number of file fields (Default: Infinity).
-  * **maxHeaderPairs** - integer: The max number of header key=>value pairs to parse Default: 2000 (same as node's http).
+  - **highWaterMark** - integer: highWaterMark to use for multipart parser instance (Default: WritableStream default).
+  - **fileHwm** - integer: highWaterMark to use for temp file streams (Default: ReadableStream default).                     
+  - **defCharset** - string: Default character set to use when one isn't defined (Default: 'utf8').
+  - **tempDir** - string: Determines temp directory. Default OS temp directory.
+  - **maxFieldNameSize** - integer:  Max field name size (in bytes) (Default: 100 bytes).
+  - **maxFieldSize** - integer: Max field value size (in bytes) (Default: 1MB).
+  - **maxFields** - integer: Max number of non-file fields (Default: Infinity). 
+  - **maxFileSize** - integer: The max file size (in bytes) (Default: Infinity).                          
+  - **maxFiles** - integer: The max number of file fields (Default: Infinity).
+  - **maxHeaderPairs** - integer: The max number of header key=>value pairs to parse Default: 2000 (same as node's http).
+
 
 
 ## Setup
