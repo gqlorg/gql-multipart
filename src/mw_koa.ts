@@ -1,4 +1,4 @@
-import {Context} from "Koa";
+import {Context} from "koa";
 import {processRequest, IGQLMultipartOptions} from './process_request';
 
 export {IGQLMultipartOptions};
