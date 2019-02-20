@@ -23,6 +23,56 @@ Just mount express-graphql as a route handler before any graphql handler middlew
 
 #### Setup for Express
 
+GraphQL schema used in following examples:
+```javascript
+import {buildSchema} from "graphql";
+
+const schema = buildSchema(`
+   scalar File
+  
+    type User {
+      id: Int
+      name: String
+      email: String
+    }
+    
+    type Query {    
+      user(id: Int!): User
+    }
+    
+    type Mutation {
+      createUser(name: String, email: String): User
+      uploadFile(userId: Int!, file: File!): String    
+      uploadFiles(userId: Int!, files: [File!]!): [String]
+    }
+  
+`);
+
+const resolvers = {
+
+   user: (args) => {
+         // return user instance
+       },
+   
+       uploadFile: ({file}) => {
+         // do anything with file
+         const data = fs.readFileSync(file.tempFile, file.encoding);    
+         return 'OK'
+       },
+   
+       uploadFiles: ({files}) => {        
+           for (const f of files) {
+             // do anything with file
+             const data = fs.readFileSync(f.tempFile, f.encoding);            
+           }
+           return 'OK';
+       }
+
+};
+
+module.exports = {schema, resolvers};
+```
+
 ````javascript
 import express from "express";
 import graphqlHTTP from "express-graphql";
@@ -53,6 +103,108 @@ app.use(mount('/graphql', graphqlHTTP({
 })));
 ````
 
+## Client implementation
+
+Request can be send easily using any client implementation which supports multipart form data. 
+
+## SPEC
+
+Consider the following guidelines:
+
+1. First part must contain graphql payload data as JSON encoded string and part name must be "payload"
+
+2. Following parts must contain variables and names must start with "$" character.
+
+3. Non string variables (number, boolean, array, object) must be encoded as JSON and Content-Type must be application/json. 
+
+4. To send array of file for single variable, use same part name.
+
+
+## Simple client using fetch
+
+gql-multipart spec is very simple and you do not need any client implementations. Following example uses FormData and fetch() method.
+
+````javascript
+
+function uploadFile(ownerId, ownerName, file, encoding) {
+  const form = new FormData();
+  const payload = {
+      query: `
+          mutation ($userId: Int!, $file: File!) {
+            uploadFile(userId: $userId, file: $file)           
+          }`
+  };
+  form.append('payload', JSON.stringify(payload));
+  form.append('$userId', ownerId, {
+      header: {'content-type': 'application/json'}
+  }); 
+  form.append('$file', file, {
+      header: encoding ? {'content-transfer-encoding': encoding}: null
+  });
+  
+  return fetch('http://localhost:4000/graphql', {
+      method: 'POST',
+      body: form
+  }).then((res) => {
+      // Upload complete
+  });
+}
+
+````
+
+````javascript
+
+function uploadFiles(ownerId, ownerName, files) {
+  const form = new FormData();
+  const payload = {
+      query: `
+          mutation ($userId: Int!, $files: [File!]!) {
+            uploadFiles(userId: $userId, files: $files)           
+          }`
+  };
+  form.append('payload', JSON.stringify(payload));
+  form.append('$userId', ownerId, {
+      header: {'content-type': 'application/json'}
+  }); 
+  for (const f of files) {
+    form.append('$files', f);
+  }
+  
+  return fetch('http://localhost:4000/graphql', {
+      method: 'POST',
+      body: form
+  }).then((res) => {
+      // Upload complete
+  });
+}
+
+````
+
+
+#### Sample request body
+
+```sh
+--------------------------5743007ba5b4
+Content-Disposition: form-data; name="payload"
+
+{ "query": "mutation ($userId: Int!, $file: File!) { uploadFile(userId: $userId, file: $file) }" }
+--------------------------5743007ba5b4
+Content-Disposition: form-data; name="$userId"
+Content-Type: application/json
+
+1528
+--------------------------5743007ba5b4
+Content-Disposition: form-data; name="$file"; filename="anyfile.txt"
+Content-Type: text/plain
+
+Any file content.
+
+--------------------------5743007ba5b4--
+```
+
+### Known client implementations
+
+* [gql-fetch](https://github.com/gqlorg/gql-fetch)
 
 ## Compatibility
 

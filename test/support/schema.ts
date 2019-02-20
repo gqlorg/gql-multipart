@@ -4,14 +4,8 @@ import fs from "fs";
 import assert from "assert";
 
 export const schema = buildSchema(`
-
   scalar File
 
-  input UserInput {
-    name: String
-    email: String
-  } 
-      
   type User {
     id: Int
     name: String
@@ -23,7 +17,7 @@ export const schema = buildSchema(`
   }
   
   type Mutation {
-    createUser(input: UserInput): User
+    createUser(name: String, email: String): User
     uploadFile(userId: Int!, file: File!): String    
     uploadFiles(userId: Int!, files: [File!]!): [String]
   }
@@ -38,9 +32,6 @@ export const resolvers = {
                 return database.users.items[i];
             }
         }
-    },
-    users: () => {
-        return database.users.items;
     },
 
     uploadFile: (args: any) => {

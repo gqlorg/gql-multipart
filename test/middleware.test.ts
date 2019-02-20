@@ -13,7 +13,8 @@ const frameWorks = [
     {
         name: 'Express',
         app: new ExpressApp()
-    }, {
+    },
+    {
         name: 'Koa',
         app: new KoaApp()
     }
