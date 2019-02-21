@@ -4,7 +4,7 @@ import {SynchrounousResult} from 'tmp';
 import createError from 'http-errors';
 import {IncomingMessage, OutgoingMessage} from "http";
 
-const Busboy  = require('busboy');
+const Busboy = require('busboy');
 
 export interface IGQLMultipartOptions {
     highWaterMark?: number;
@@ -183,16 +183,14 @@ export function processRequest(
         busboy.once('filesLimit', /*istanbul ignore next: We dont test busboy*/ () =>
             done(createError(413, `${options.maxFiles} max file uploads exceeded.`))
         );
+        let requestEnded: boolean;
         busboy.on('finish', () => {
+            requestEnded = true;
             if (!payload)
                 return done(createError(400, 'Missing "payload" multipart field'));
             done();
         });
-
-        let requestEnded: boolean;
-        req.once('end', () => {
-            requestEnded = true;
-        });
+        
         req.once('close', () => {
             /*istanbul ignore next: hard to evaluate*/
             if (!requestEnded)
