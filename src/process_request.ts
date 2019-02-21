@@ -1,8 +1,10 @@
 import fs from 'fs';
-import Busboy from 'busboy';
-import tmp, {SynchrounousResult} from 'tmp';
+import tmp from 'tmp';
+import {SynchrounousResult} from 'tmp';
 import createError from 'http-errors';
 import {IncomingMessage, OutgoingMessage} from "http";
+
+const Busboy  = require('busboy');
 
 export interface IGQLMultipartOptions {
     highWaterMark?: number;
