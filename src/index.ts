@@ -1,2 +1,2 @@
-export * from './mw_express';
-export * from './mw_koa';
+export {gqlMultipartExpress} from './mw_express';
+export {gqlMultipartKoa} from './mw_koa';
