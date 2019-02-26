@@ -177,7 +177,7 @@ function uploadFile(ownerId, ownerName, file, encoding) {
       header: encoding ? {'content-transfer-encoding': encoding}: null
   });
   
-  return fetch('http://localhost:4000/graphql', {
+  return fetch('http://localhost:3999/graphql', {
       method: 'POST',
       body: form
   }).then((res) => {
@@ -205,7 +205,7 @@ function uploadFiles(ownerId, ownerName, files) {
     form.append('$files', f);
   }
   
-  return fetch('http://localhost:4000/graphql', {
+  return fetch('http://localhost:3999/graphql', {
       method: 'POST',
       body: form
   }).then((res) => {

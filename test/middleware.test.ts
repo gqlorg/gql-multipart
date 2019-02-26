@@ -6,9 +6,6 @@ import KoaApp from "./support/KoaApp";
 import fetch from "node-fetch";
 import FormData from "form-data";
 
-const {rejects} = require('rejected-or-not');
-assert.rejects = assert.rejects || rejects;
-
 const frameWorks = [
     {
         name: 'Express',
@@ -27,14 +24,14 @@ for (const framework of frameWorks) {
     describe(framework.name, () => {
 
         before(() => {
-            return app.start(4000);
+            return app.start(3999);
         });
 
         after(() => {
             return app.stop();
         });
 
-        it("Should accept multipart requests", () => {
+        it("Should accept multipart requests (`payload`)", () => {
             const form = new FormData();
             const x = {
                 query: `query ($id: Int!) {
@@ -47,7 +44,30 @@ for (const framework of frameWorks) {
             form.append('$id', 1, {
                 header: {'content-type': 'application/json'}
             });
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
+                method: 'POST',
+                body: form
+            }).then(async (res) => {
+                assert.strictEqual(res.status, 200, res.statusText);
+                const json = await res.json();
+                assert(json);
+                assert(!json.errors, json.errors && json.errors[0].message);
+                assert(json.data);
+                assert(json.data.user);
+                assert.strictEqual(json.data.user.name, 'User 1');
+            });
+        });
+
+        it("Should accept multipart requests (`query`, `variables`)", () => {
+            const form = new FormData();
+            const query = `query ($id: Int!) {
+              user(id: $id) {
+                name
+              }            
+            }`;
+            form.append('query', query);
+            form.append('variables', JSON.stringify({id: 1}));
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then(async (res) => {
@@ -74,7 +94,7 @@ for (const framework of frameWorks) {
             });
             const stream = fs.createReadStream(__dirname + '/support/file1.txt');
             form.append('$file', stream);
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then(async (res) => {
@@ -103,7 +123,7 @@ for (const framework of frameWorks) {
                 header: {'content-transfer-encoding': 'utf8'}
             });
             form.append('$files', fs.createReadStream(__dirname + '/support/file2.txt'));
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then(async (res) => {
@@ -121,7 +141,20 @@ for (const framework of frameWorks) {
         it("Should return status 400 if payload is not a valid json", () => {
             const form = new FormData();
             form.append('payload', '>0<');
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
+                method: 'POST',
+                body: form
+            }).then((res) => {
+                assert.strictEqual(res.status, 400, res.statusText);
+                assert(res.statusText.includes('Invalid JSON'), res.statusText);
+            });
+        });
+
+        it("Should return status 400 if `variables` part is not a valid json", () => {
+            const form = new FormData();
+            form.append('query', '{}');
+            form.append('variables', '>0<');
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then((res) => {
@@ -136,7 +169,7 @@ for (const framework of frameWorks) {
             form.append('$x', '>0<', {
                 header: {'content-type': 'application/json'}
             });
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then((res) => {
@@ -149,7 +182,7 @@ for (const framework of frameWorks) {
             const form = new FormData();
             form.append('payload', '{}');
             form.append('x', 1);
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then((res) => {
@@ -161,7 +194,7 @@ for (const framework of frameWorks) {
         it("Should return status 400 if first part is not payload", () => {
             const form = new FormData();
             form.append('$files', fs.createReadStream(__dirname + '/support/file1.txt'));
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then(async (res) => {
@@ -172,7 +205,7 @@ for (const framework of frameWorks) {
 
         it("Should return status 400 if payload part not sent", () => {
             const form = new FormData();
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: form
             }).then(async (res) => {
@@ -181,7 +214,7 @@ for (const framework of frameWorks) {
             });
         });
 
-        it("Should ignore mw if not multipart request", () => {
+        it("Should ignore mw if request is not not multipart", () => {
             const body = {
                 query: `query{
               user(id: 1) {
@@ -189,7 +222,7 @@ for (const framework of frameWorks) {
               }            
             }`
             };
-            return fetch('http://localhost:4000/graphql', {
+            return fetch('http://localhost:3999/graphql', {
                 method: 'POST',
                 body: JSON.stringify(body),
                 headers: {'Content-Type': 'application/json'},

@@ -114,8 +114,20 @@ export function processRequest(
                     done(createError(400, 'Invalid JSON in the "payload" multipart field'));
                 }
             }
+            if (fieldName === 'query') {
+                payload = {query: value};
+                return;
+            }
             if (!payload)
-                return done(createError(400, 'First multipart field must be "payload"'));
+                return done(createError(400, 'First multipart field must be "payload" or "query"'));
+            if (fieldName === 'variables') {
+                try {
+                    payload.variables = JSON.parse(value);
+                    return;
+                } catch (error) {
+                    done(createError(400, 'Invalid JSON in the "variables" multipart field'));
+                }
+            }
             if (!fieldName.startsWith('$'))
                 return done(createError(400, 'Variable fields must start with "$" character'));
             if (mimetype === 'application/json')
@@ -190,7 +202,7 @@ export function processRequest(
                 return done(createError(400, 'Missing "payload" multipart field'));
             done();
         });
-        
+
         req.once('close', () => {
             /*istanbul ignore next: hard to evaluate*/
             if (!requestEnded)

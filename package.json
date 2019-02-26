@@ -39,7 +39,7 @@
     "@types/http-errors": "^1.6.1",
     "@types/koa": "^2.0.48",
     "@types/koa-mount": "^3.0.1",
-    "@types/koa-router": "^7.0.39",
+    "@types/koa-router": "^7.0.40",
     "@types/mocha": "^5.2.5",
     "@types/node-fetch": "^2.1.6",
     "@types/tmp": "^0.0.34",
@@ -51,13 +51,12 @@
     "koa-graphql": "^0.8.0",
     "koa-mount": "^4.0.0",
     "koa-router": "^7.4.0",
-    "mocha": "^6.0.0",
+    "mocha": "^6.0.2",
     "node-fetch": "^2.3.0",
     "nyc": "^13.3.0",
-    "rejected-or-not": "^1.0.1",
-    "tslint": "^5.12.1",
     "ts-node": "^8.0.2",
-    "typescript": "^3.2.4"
+    "tslint": "^5.13.0",
+    "typescript": "^3.3.3333"
   },
   "peerDependencies": {},
   "engines": {
